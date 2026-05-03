@@ -45,7 +45,8 @@ html, body { height: 100%; margin: 0; }
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
  <body class="h-full overflow-auto" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);">
-  <div id="app" class="h-full w-full flex flex-col items-center p-3 gap-3"><!-- Title -->
+  <div id="app" class="h-full w-full flex flex-col items-center p-3 gap-3">
+   <!-- Title -->
    <h1 id="game-title" class="text-xl md:text-2xl font-black text-white text-center drop-shadow-lg" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">🤝 Ular Tangga Gotong Royong 🤝</h1><!-- Setup Screen -->
    <div id="setup-screen" class="w-full max-w-md mx-auto bg-white/95 rounded-2xl p-6 shadow-2xl" style="animation: bounce-in 0.5s ease-out;">
     <h2 class="text-lg font-black text-center text-purple-700 mb-4">🎮 Pilih Pemain</h2>
@@ -79,16 +80,19 @@ html, body { height: 100%; margin: 0; }
     <p id="selected-count" class="text-center text-sm text-gray-500 mb-3">Pilih minimal 2 pemain</p><button id="start-btn" onclick="startGame()" disabled class="w-full py-3 rounded-xl font-black text-white text-lg bg-gray-300 cursor-not-allowed transition-all">🎲 Mulai!</button>
    </div><!-- Game Screen -->
    <div id="game-screen" class="w-full hidden" style="max-width: 900px;">
-    <div class="flex flex-col lg:flex-row gap-3 items-start"><!-- Board -->
+    <div class="flex flex-col lg:flex-row gap-3 items-start">
+     <!-- Board -->
      <div class="flex-1 w-full">
       <div id="board" class="grid gap-1 w-full" style="grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(5, 1fr);"></div>
      </div><!-- Side Panel -->
-     <div class="w-full lg:w-56 flex flex-col gap-2"><!-- Current Player -->
+     <div class="w-full lg:w-56 flex flex-col gap-2">
+      <!-- Current Player -->
       <div id="current-player-box" class="bg-white/95 rounded-xl p-3 text-center shadow-lg">
        <p class="text-xs font-bold text-gray-500">GILIRAN</p>
        <div id="current-player-display" class="text-lg font-black"></div>
       </div><!-- Dice -->
-      <div class="bg-white/95 rounded-xl p-3 flex flex-col items-center gap-2 shadow-lg"><button id="dice-btn" onclick="rollDice()" class="dice-btn bg-gradient-to-br from-amber-400 to-orange-500 text-white">🎲</button>
+      <div class="bg-white/95 rounded-xl p-3 flex flex-col items-center gap-2 shadow-lg">
+       <button id="dice-btn" onclick="rollDice()" class="dice-btn bg-gradient-to-br from-amber-400 to-orange-500 text-white">🎲</button>
        <div id="dice-result" class="text-sm font-bold text-gray-600"></div>
       </div><!-- Scores -->
       <div id="scores-panel" class="bg-white/95 rounded-xl p-3 shadow-lg">
@@ -104,7 +108,8 @@ html, body { height: 100%; margin: 0; }
   </div><!-- Question Modal -->
   <div id="question-modal" class="modal-overlay hidden">
    <div class="modal-content bg-white rounded-2xl p-5 mx-3 shadow-2xl" style="max-width: 400px; width: 100%;">
-    <div class="text-center mb-1"><span class="text-3xl">📝</span>
+    <div class="text-center mb-1">
+     <span class="text-3xl">📝</span>
     </div>
     <p id="q-text" class="text-center font-bold text-gray-800 mb-4 text-sm leading-relaxed"></p>
     <div id="q-options" class="flex flex-col gap-2"></div>
@@ -206,10 +211,10 @@ const PLAYERS_DEF = [
 
 const CELL_COLORS = [
   '#fef3c7','#dbeafe','#dcfce7','#fce7f3','#e0e7ff','#fef9c3',
-  '#cffafe','#f3e8ff','#ffe4e6','#d1fae5','#fef3c7','#dbeafe',
-  '#dcfce7','#fce7f3','#e0e7ff','#fef9c3','#cffafe','#f3e8ff',
-  '#ffe4e6','#d1fae5','#fef3c7','#dbeafe','#dcfce7','#fce7f3',
-  '#e0e7ff','#fef9c3','#cffafe','#f3e8ff','#ffe4e6','#d1fae5'
+  '#cffafe','#f3e8ff','#ffe4e6','#d1fae5','#fefce8','#fecdd3',
+  '#fed7aa','#fda34b','#fb923c','#f97316','#ea580c','#c2410c',
+  '#dcfce7','#bbf7d0','#86efac','#65a30d','#84cc16','#a3e635',
+  '#e0e7ff','#c7d2fe','#a5b4fc','#818cf8','#6366f1','#4f46e5',
 ];
 
 let selectedPlayers = new Set();
@@ -561,21 +566,27 @@ function answerQuestion(chosen, correct) {
   
   if (chosen === correct) {
     p.score += 10;
-    sfxCorrect();
+    try { sfxCorrect(); } catch(e) { console.log('sfx error:', e); }
     document.getElementById('result-icon').textContent = '🎉';
     document.getElementById('result-text').textContent = 'Benar!';
     document.getElementById('result-text').style.color = '#16a34a';
-    document.getElementById('result-sub').textContent = '+10 poin!';
+    document.getElementById('result-sub').textContent = '+10 poin! 🌟';
   } else {
-    sfxWrong();
+    try { sfxWrong(); } catch(e) { console.log('sfx error:', e); }
     document.getElementById('result-icon').textContent = '😢';
     document.getElementById('result-text').textContent = 'Salah!';
     document.getElementById('result-text').style.color = '#dc2626';
     document.getElementById('result-sub').textContent = 'Jawaban: ' + ['a','b','c'][correct];
   }
   
+  // Force update scores immediately
   updateScores();
-  document.getElementById('result-modal').classList.remove('hidden');
+  
+  // Show result modal
+  const resultModal = document.getElementById('result-modal');
+  if (resultModal) {
+    resultModal.classList.remove('hidden');
+  }
 }
 
 function closeResult() {
@@ -658,5 +669,5 @@ function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 lucide.createIcons();
 </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f5e044d90a6e778',t:'MTc3Nzc5ODIxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f5e3c9410d07d66',t:'MTc3NzgwMDUxOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
