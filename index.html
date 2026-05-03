@@ -206,10 +206,10 @@ const PLAYERS_DEF = [
 
 const CELL_COLORS = [
   '#fef3c7','#dbeafe','#dcfce7','#fce7f3','#e0e7ff','#fef9c3',
-  '#cffafe','#f3e8ff','#ffe4e6','#d1fae5','#fefce8','#fecdd3',
-  '#fed7aa','#fda34b','#fb923c','#f97316','#ea580c','#c2410c',
-  '#dcfce7','#bbf7d0','#86efac','#65a30d','#84cc16','#a3e635',
-  '#e0e7ff','#c7d2fe','#a5b4fc','#818cf8','#6366f1','#4f46e5',
+  '#cffafe','#f3e8ff','#ffe4e6','#d1fae5','#fef3c7','#dbeafe',
+  '#dcfce7','#fce7f3','#e0e7ff','#fef9c3','#cffafe','#f3e8ff',
+  '#ffe4e6','#d1fae5','#fef3c7','#dbeafe','#dcfce7','#fce7f3',
+  '#e0e7ff','#fef9c3','#cffafe','#f3e8ff','#ffe4e6','#d1fae5'
 ];
 
 let selectedPlayers = new Set();
@@ -438,7 +438,7 @@ async function rollDice() {
   const btn = document.getElementById('dice-btn');
   btn.disabled = true;
   btn.classList.add('dice-rolling');
-  try { sfxDice(); } catch(e) { console.log('sfx dice error:', e); }
+  sfxDice();
   
   const result = Math.floor(Math.random() * 6) + 1;
   const diceEmojis = ['⚀','⚁','⚂','⚃','⚄','⚅'];
@@ -468,7 +468,7 @@ async function movePlayer(steps) {
   for (let i = p.pos + 1; i <= target; i++) {
     p.pos = i;
     placePions();
-    try { sfxMove(); } catch(e) { console.log('sfx move error:', e); }
+    sfxMove();
     await delay(250);
   }
   
@@ -484,7 +484,7 @@ async function movePlayer(steps) {
   // Check snake or ladder
   if (snakes[p.pos]) {
     document.getElementById('info-text').textContent = `🐍 Ular! Turun ke ${snakes[p.pos]}`;
-    try { sfxSnake(); } catch(e) { console.log('sfx snake error:', e); }
+    sfxSnake();
     const pion = document.getElementById(`pion-${currentPlayerIdx}`);
     if (pion) pion.style.animation = 'snake-eat 0.6s ease';
     await delay(700);
@@ -501,7 +501,7 @@ async function movePlayer(steps) {
     }
   } else if (ladders[p.pos]) {
     document.getElementById('info-text').textContent = `🪜 Tangga! Naik ke ${ladders[p.pos]}`;
-    try { sfxLadder(); } catch(e) { console.log('sfx ladder error:', e); }
+    sfxLadder();
     const pion = document.getElementById(`pion-${currentPlayerIdx}`);
     if (pion) pion.style.animation = 'ladder-climb 0.6s ease';
     await delay(700);
@@ -520,12 +520,7 @@ async function movePlayer(steps) {
   // Show question (not for cell 1)
   await delay(400);
   if (p.pos > 1) {
-    try {
-      showQuestion();
-    } catch(e) {
-      console.log('Question error:', e);
-      nextTurn();
-    }
+    showQuestion();
   } else {
     nextTurn();
   }
@@ -566,29 +561,21 @@ function answerQuestion(chosen, correct) {
   
   if (chosen === correct) {
     p.score += 10;
-    try { sfxCorrect(); } catch(e) { console.log('sfx correct error:', e); }
+    sfxCorrect();
     document.getElementById('result-icon').textContent = '🎉';
     document.getElementById('result-text').textContent = 'Benar!';
     document.getElementById('result-text').style.color = '#16a34a';
-    document.getElementById('result-sub').textContent = '+10 poin! 🌟';
+    document.getElementById('result-sub').textContent = '+10 poin!';
   } else {
-    try { sfxWrong(); } catch(e) { console.log('sfx wrong error:', e); }
+    sfxWrong();
     document.getElementById('result-icon').textContent = '😢';
     document.getElementById('result-text').textContent = 'Salah!';
     document.getElementById('result-text').style.color = '#dc2626';
     document.getElementById('result-sub').textContent = 'Jawaban: ' + ['a','b','c'][correct];
   }
   
-  // Force update scores immediately after answer
-  setTimeout(() => {
-    updateScores();
-  }, 50);
-  
-  // Show result modal
-  const resultModal = document.getElementById('result-modal');
-  if (resultModal) {
-    resultModal.classList.remove('hidden');
-  }
+  updateScores();
+  document.getElementById('result-modal').classList.remove('hidden');
 }
 
 function closeResult() {
@@ -607,7 +594,7 @@ function nextTurn() {
 }
 
 function finishGame() {
-  try { sfxWin(); } catch(e) { console.log('sfx win error:', e); }
+  sfxWin();
   const sorted = [...players].sort((a, b) => {
     if (a.pos === 30 && b.pos !== 30) return -1;
     if (b.pos === 30 && a.pos !== 30) return 1;
@@ -671,5 +658,5 @@ function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 lucide.createIcons();
 </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f5e6587f0009509',t:'MTc3NzgwMjE5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f5e044d90a6e778',t:'MTc3Nzc5ODIxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
